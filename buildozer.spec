@@ -1,6 +1,6 @@
 [app]
-title = Chelik
-package.name = chelik
+title = Gray Game
+package.name = graygame
 package.domain = org.example
 source.dir = .
 source.include_exts = py,png,jpg,jpeg,mp3,json
@@ -11,7 +11,7 @@ requirements = python3,kivy
 orientation = portrait
 fullscreen = 0
 
-# Важно: согласовано с тем, что ставится в workflow (platforms;android-34)
+# Важно: API 34 — это то, что мы ставим в workflow
 android.api = 34
 android.minapi = 23
 android.archs = arm64-v8a, armeabi-v7a
