@@ -31,25 +31,18 @@ jobs:
           mkdir -p "$ANDROID_SDK_ROOT"
           mkdir -p "$ANDROID_CMDLINE_TOOLS"
           echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> "$GITHUB_ENV"
-          # sdkmanager будет в cmdline-tools/latest/bin
-          echo "PATH=$PATH:$ANDROID_SDK_ROOT/tools:$ANDROID_SDK_ROOT/tools/bin:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_CMDLINE_TOOLS/latest/bin" >> "$GITHUB_ENV"
+          # sdkmanager лежит в cmdline-tools/bin (не в latest)
+          echo "PATH=$PATH:$ANDROID_SDK_ROOT/tools:$ANDROID_SDK_ROOT/tools/bin:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_CMDLINE_TOOLS/bin" >> "$GITHUB_ENV"
 
       - name: Install Android cmdline-tools
         run: |
           URL="https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip"
           curl -Lo cmdline-tools.zip "$URL"
           unzip -q cmdline-tools.zip -d "$HOME/.buildozer/android/platform/"
-
-          ORIG_DIR="$HOME/.buildozer/android/platform/cmdline-tools"
-          TARGET_DIR="$HOME/.buildozer/android/platform/cmdline-tools/latest"
-
-          mkdir -p "$TARGET_DIR"
-          mv "$ORIG_DIR"/* "$TARGET_DIR"/
-          rmdir "$ORIG_DIR"
+          # После распаковки будет: cmdline-tools/bin/sdkmanager
 
       - name: Accept Android SDK licenses
         run: |
-          # Сначала пробуем принять лицензии; если что-то требует подтверждения — yes всё подтвердит
           sdkmanager --licenses || true
           yes | sdkmanager --licenses
 
@@ -69,5 +62,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: chelik-apk
+          name: gray-game-apk
           path: bin/*.apk
