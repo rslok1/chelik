@@ -1,12 +1,22 @@
 [app]
-title = chelik
+title = Chelik
 package.name = chelik
-package.domain = org.test
+package.domain = org.example
 source.dir = .
-source.include_exts = py,png,jpg,mp3
-orientation = landscape
-version = 1.0.0
-requirements = python3==3.10.0,hostpython3==3.10.0,pygame
+source.include_exts = py,png,jpg,jpeg,mp3,json
+version = 0.1
+
+requirements = python3,kivy
+
+orientation = portrait
+fullscreen = 0
+
+# Важно: согласовано с тем, что ставится в workflow (platforms;android-34)
 android.api = 34
-android.minapi = 24
-android.ndk = 25b
+android.minapi = 23
+android.archs = arm64-v8a, armeabi-v7a
+android.permissions =
+
+[buildozer]
+log_level = 2
+warn_on_root = 1
