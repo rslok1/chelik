@@ -1,22 +1,12 @@
 [app]
-title = Gray Game
-package.name = graygame
-package.domain = org.example
+title = chelik
+package.name = chelik
+package.domain = org.test
 source.dir = .
-source.include_exts = py,png,jpg,jpeg,mp3
-version = 0.1
-
-requirements = python3,kivy
-
-orientation = portrait
-fullscreen = 0
-
-# Согласовано с SDK в workflow: платформа 34, build-tools 34
+source.include_exts = py,png,jpg,mp3
+orientation = landscape
+version = 1.0.0
+requirements = python3==3.10.0,hostpython3==3.10.0,pygame
 android.api = 34
-android.minapi = 23
-android.archs = arm64-v8a, armeabi-v7a
-android.permissions =
-
-[buildozer]
-log_level = 2
-warn_on_root = 1
+android.minapi = 24
+android.ndk = 25b
