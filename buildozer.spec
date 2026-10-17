@@ -6,15 +6,15 @@ source.dir = .
 source.include_exts = py,png,jpg,jpeg,mp3,json
 version = 0.1
 
-requirements = requirements = python3==3.11.9,kivy==2.3.0
+requirements = python3==3.10.0,hostpython3==3.10.0,pygame
 
 
-orientation = portrait
+orientation = landscape
 fullscreen = 0
 
 # Версии API
 android.api = 34
-android.minapi = 21
+android.minapi = 24
 android.ndk_api = 21
 android.archs = arm64-v8a
 android.allow_backup = True
