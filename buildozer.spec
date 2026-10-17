@@ -1,26 +1,22 @@
 [app]
-title = Gray Game
-package.name = graygame
-package.domain = org.example
+title = Chelik Game
+package.name = chelik
+package.domain = org.test
 source.dir = .
 source.include_exts = py,png,jpg,jpeg,mp3,json
-version = 0.1
+version = 1.0.0
 
-requirements = python3==3.10.0,hostpython3==3.10.0,pygame
+# Вместо pygame ставим kivy с проверенным Python 3.10
+requirements = python3==3.10.0,hostpython3==3.10.0,kivy==2.3.0
 
-
-orientation = landscape
+orientation = portrait
 fullscreen = 0
 
-# Версии API
-android.api = 34
-android.minapi = 24
-android.ndk_api = 21
+# Совпадает с NDK и SDK из вашего рабочего YAML
+android.api = 33
+android.minapi = 21
+android.ndk = 25b
 android.archs = arm64-v8a
-android.allow_backup = True
-
-# Автоматический приём лицензий
-android.accept_sdk_license = True
 
 [buildozer]
 log_level = 2
