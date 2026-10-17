@@ -17,12 +17,22 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            git zip unzip openjdk-17-jdk \
+            git zip unzip \
+            openjdk-17-jdk \
             python3-pip python3-venv \
             autoconf libtool pkg-config \
             zlib1g-dev libncurses5-dev libncursesw5-dev \
             libtinfo5 cmake libffi-dev libssl-dev \
             build-essential
+
+      # ВАЖНО: Явно задаем JAVA_HOME, чтобы sdkmanager и Buildozer использовали Java 17
+      - name: Set Java 17 environment
+        run: |
+          echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> "$GITHUB_ENV"
+          echo "PATH=${JAVA_HOME}/bin:$PATH" >> "$GITHUB_ENV"
+
+      - name: Verify Java version
+        run: java -version
 
       - name: Set up Android SDK paths
         run: |
@@ -30,36 +40,46 @@ jobs:
           ANDROID_CMDLINE_TOOLS="$HOME/.buildozer/android/platform/cmdline-tools"
           mkdir -p "$ANDROID_SDK_ROOT"
           mkdir -p "$ANDROID_CMDLINE_TOOLS"
+          
           echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> "$GITHUB_ENV"
-          # sdkmanager лежит в cmdline-tools/bin (не в latest)
-          echo "PATH=$PATH:$ANDROID_SDK_ROOT/tools:$ANDROID_SDK_ROOT/tools/bin:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_CMDLINE_TOOLS/bin" >> "$GITHUB_ENV"
+          # Добавляем пути к Android SDK в PATH
+          echo "PATH=$PATH:$ANDROID_SDK_ROOT/tools:$ANDROID_SDK_ROOT/tools/bin:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_CMDLINE_TOOLS/latest/bin" >> "$GITHUB_ENV"
 
       - name: Install Android cmdline-tools
         run: |
           URL="https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip"
           curl -Lo cmdline-tools.zip "$URL"
           unzip -q cmdline-tools.zip -d "$HOME/.buildozer/android/platform/"
-          # После распаковки будет: cmdline-tools/bin/sdkmanager
+          
+          # КРИТИЧНО: Новые cmdline-tools распаковываются в папку cmdline-tools, 
+          # а внутри должна быть папка latest. Buildozer и sdkmanager ожидают именно такую структуру.
+          if [ ! -d "$ANDROID_CMDLINE_TOOLS/latest" ]; then
+            mv "$ANDROID_CMDLINE_TOOLS/cmdline-tools" "$ANDROID_CMDLINE_TOOLS/latest"
+          fi
 
       - name: Accept Android SDK licenses
         run: |
-          sdkmanager --licenses || true
-          yes | sdkmanager --licenses
+          # Принимаем лицензии автоматически. 
+          # Флаг --no_ui важен для CI, чтобы не было попыток открыть GUI.
+          sdkmanager --licenses --no_ui || true
 
       - name: Install required SDK components
         run: |
           sdkmanager "platform-tools" "build-tools;34.0.0" "platforms;android-34"
 
-      - name: Install Buildozer
+      - name: Install Buildozer and dependencies
         run: |
           python3 -m pip install --user --upgrade pip
+          # Ставим конкретную версию cython, которая стабильна с текущими p4a
           python3 -m pip install --user buildozer cython==0.29.36
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
-      - name: Build APK
-        run: buildozer android debug
+      - name: Build APK with Buildozer
+        run: |
+          # Отключаем интерактивный ввод (-n), чтобы сборка не зависла, ожидая ответа в CI
+          buildozer -n android debug
 
-      - name: Upload APK
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: gray-game-apk
