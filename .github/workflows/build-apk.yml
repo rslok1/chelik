@@ -38,16 +38,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install --upgrade buildozer "cython<3.0" virtualenv
 
-      - name: Build APK with Buildozer
-        env:
-          # Используем уже установленный в GitHub Actions SDK
-          ANDROID_HOME: /usr/local/lib/android/sdk
-          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+      - name: Pre-accept Android Licenses
         run: |
-          # Автоматически принимаем все лицензии Android SDK
           yes | /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --licenses || true
-          
-          # Запуск сборки
+          mkdir -p /home/runner/.buildozer/android/platform/android-sdk/licenses
+          cp -r /usr/local/lib/android/sdk/licenses/* /home/runner/.buildozer/android/platform/android-sdk/licenses/ || true
+
+      - name: Build APK with Buildozer
+        run: |
+          # Очистка и чистая сборка под Python 3.11
+          buildozer android clean
           buildozer -v android debug
 
       - name: Upload APK Artifact
@@ -56,4 +56,3 @@ jobs:
           name: game-apk
           path: bin/*.apk
           if-no-files-found: error
-
