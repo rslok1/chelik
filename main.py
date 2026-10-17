@@ -6,6 +6,17 @@ import json
 # Игнорируем лишние аргументы командной строки Kivy
 os.environ['KIVY_NO_ARGS'] = '1'
 
+# Устанавливаем альбомную (горизонтальную) ориентацию окна до загрузки графического контекста
+from kivy.config import Config
+Config.set('graphics', 'orientation', 'landscape')
+
+from kivy.core.window import Window
+# Фиксируем альбомную ориентацию на устройствах
+try:
+    Window.orientation = 'landscape'
+except Exception:
+    pass
+
 import kivy
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -39,7 +50,7 @@ MUSIC_ICON_FILE = "music_icon.png"
 PLAYER_SKIN = {
     "name": "Герой",
     "color": (1, 1, 1, 1),
-    "image": "chel1.png"  # Убедитесь, что файл рядом с main.py
+    "image": "chel1.png"
 }
 
 
@@ -69,12 +80,12 @@ class MenuScreen(Screen):
         super().__init__(**kwargs)
         self.main_layout = BoxLayout(orientation='vertical')
 
-        # --- САМАЯ ВЕРХНЯЯ СЕКЦИЯ: Кнопка музыки по центру ---
-        top_music_box = BoxLayout(size_hint_y=0.1, padding=[10, 5, 10, 5])
+        # --- САМАЯ ВЕРХНЯЯ СЕКЦИЯ: Кнопка музыки по центру (адаптирована под альбомный экран) ---
+        top_music_box = BoxLayout(size_hint_y=0.14, padding=[10, 4, 10, 4])
 
         self.music_btn = Button(
             text="МУЗЫКА",
-            size_hint=(0.5, 1),
+            size_hint=(0.3, 1),
             pos_hint={'center_x': 0.5, 'center_y': 0.5},
             background_color=(0.15, 0.25, 0.35, 1),
             bold=True
@@ -89,14 +100,14 @@ class MenuScreen(Screen):
 
         self.music_btn.bind(on_release=self.open_music_popup)
 
-        top_music_box.add_widget(Widget(size_hint_x=0.25))
+        top_music_box.add_widget(Widget(size_hint_x=0.35))
         top_music_box.add_widget(self.music_btn)
-        top_music_box.add_widget(Widget(size_hint_x=0.25))
+        top_music_box.add_widget(Widget(size_hint_x=0.35))
 
         self.main_layout.add_widget(top_music_box)
 
-        # --- ВТОРАЯ СЕКЦИЯ: Заголовок (кнопка скинов удалена) ---
-        top_bar = BoxLayout(size_hint_y=0.08, padding=5, spacing=10)
+        # --- ВТОРАЯ СЕКЦИЯ: Заголовок ---
+        top_bar = BoxLayout(size_hint_y=0.11, padding=[10, 2, 10, 2])
 
         title_btn = Button(
             text="СЕРЫЙ ПУТЬ (100 Ур.)",
@@ -108,9 +119,9 @@ class MenuScreen(Screen):
         top_bar.add_widget(title_btn)
         self.main_layout.add_widget(top_bar)
 
-        # --- СЕТКА СО 100 УРОВНЯМИ ---
-        self.scroll = ScrollView(size_hint=(1, 0.82))
-        self.grid = GridLayout(cols=4, spacing=10, padding=10, size_hint_y=None)
+        # --- СЕТКА СО 100 УРОВНЯМИ (для горизонтального экрана 8 колонок удобнее) ---
+        self.scroll = ScrollView(size_hint=(1, 0.75))
+        self.grid = GridLayout(cols=8, spacing=8, padding=10, size_hint_y=None)
         self.grid.bind(minimum_height=self.grid.setter('height'))
 
         self.scroll.add_widget(self.grid)
@@ -130,8 +141,8 @@ class MenuScreen(Screen):
             btn = Button(
                 text=str(i) if unlocked else "",
                 size_hint_y=None,
-                height=85,
-                font_size=18,
+                height=65,
+                font_size=16,
                 bold=True,
                 background_color=(0.2, 0.7, 0.3, 1) if unlocked else (0.25, 0.25, 0.25, 1),
                 color=(1, 1, 1, 1) if unlocked else (0.5, 0.5, 0.5, 1),
@@ -146,7 +157,7 @@ class MenuScreen(Screen):
 
     def open_music_popup(self, instance):
         app = App.get_running_app()
-        content = BoxLayout(orientation='vertical', spacing=10, padding=10)
+        content = BoxLayout(orientation='vertical', spacing=8, padding=10)
 
         for tr in TRACKS:
             is_selected = (tr['id'] == app.current_music_id)
@@ -155,7 +166,7 @@ class MenuScreen(Screen):
             m_btn = Button(
                 text=btn_text,
                 size_hint_y=None,
-                height=55,
+                height=48,
                 background_color=(0.2, 0.6, 0.4, 1) if is_selected else (0.25, 0.25, 0.3, 1)
             )
 
@@ -166,7 +177,7 @@ class MenuScreen(Screen):
             m_btn.bind(on_release=select_track)
             content.add_widget(m_btn)
 
-        popup = Popup(title="Выберите фоновую музыку", content=content, size_hint=(0.85, 0.55), auto_dismiss=True)
+        popup = Popup(title="Выберите фоновую музыку", content=content, size_hint=(0.6, 0.75), auto_dismiss=True)
         popup.open()
 
 
@@ -183,7 +194,6 @@ class GameWidget(Widget):
         self.speed = 6.5
         self.touch_target = None
 
-        # Увеличенный размер персонажа (64x64)
         self.player_size = 100
         with self.canvas:
             self.bg_color = Color(0.22, 0.22, 0.24, 1)
@@ -274,8 +284,8 @@ class GameScreen(Screen):
 
         back = Button(
             text="Меню",
-            size_hint=(0.25, 0.08),
-            pos_hint={'x': 0.02, 'y': 0.90},
+            size_hint=(0.16, 0.12),
+            pos_hint={'x': 0.02, 'y': 0.85},
             background_color=(0.2, 0.2, 0.2, 0.8)
         )
         back.bind(on_release=self.go_back)
