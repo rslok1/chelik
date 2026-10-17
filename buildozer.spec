@@ -9,7 +9,7 @@ version = 1.0.0
 # Вместо pygame ставим kivy с проверенным Python 3.10
 requirements = python3==3.10.0,hostpython3==3.10.0,kivy==2.3.0
 
-orientation = portrait
+orientation = landscape
 fullscreen = 0
 
 # Совпадает с NDK и SDK из вашего рабочего YAML
